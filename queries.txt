@@ -1,0 +1,71 @@
+PUT data_employees/t/3
+{
+  "name":"katy",
+  "age":40,
+  "jobId":17
+}
+
+PUT data_jobs/t/17
+{
+  "employee":"katy",
+  "job":"stylist"
+}
+
+
+GET data_employees/_search
+{
+  "fields": ["_source"], 
+  "script_fields": {
+    "employee_job": {
+      "lang": "native",
+      "script": "outer_join",
+      "params": {
+        "_index":"data_jobs",
+        "joinFieldLeft":"jobId",
+        "joinFieldRight":"_id",
+        "field":"job"
+      }
+    }
+  }
+}
+
+GET data_employees/_search
+{
+  "query": {"range": {
+    "age": {
+      "from": 37
+    }
+  }}, 
+  "fields": ["_source"], 
+  "script_fields": {
+    "employee_job": {
+      "lang": "native",
+      "script": "outer_join",
+      "params": {
+        "_index":"data_jobs",
+        "joinFieldLeft":"jobId",
+        "joinFieldRight":"_id",
+        "field":"job"
+      }
+    }
+  }
+}
+
+
+GET data_jobs/_search
+{
+  "fields": ["_source"], 
+  "script_fields": {
+    "employee_name": {
+      "lang": "native",
+      "script": "outer_join",
+      "params": {
+        "_index":"data_employees",
+        "joinFieldLeft":"employee",
+        "joinFieldRight":"name",
+        "field":"age"
+      }
+    }
+  }
+}
+
